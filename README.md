@@ -1,6 +1,6 @@
 # CoT Causal Analysis
 
-**causal analysis of chain-of-thought** by editing individual reasoning steps with a counterfactual and checking whether the final answer changes.
+**Causal analysis of chain-of-thought in LLMs** by editing individual reasoning steps with a counterfactual and checking whether the final answer changes.
 
 ## File Structure
 - `modules/model.py`: Hugging Face `transformers` wrapper (loads models with `trust_remote_code=True`).
