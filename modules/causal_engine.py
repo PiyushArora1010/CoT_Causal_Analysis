@@ -18,49 +18,69 @@ Question: {question}
 Let's think step by step:
 """
 
-        self.prompt_to_counterfactual = """You are an expert in causal reasoning and chain-of-thought analysis. Your task is to construct a **counterfactual** version of a specific reasoning step using one of two permitted operations.
+        self.prompt_to_counterfactual = """You are an expert in causal reasoning. Your task is to generate a **plausible counterfactual version** of a specific reasoning step.
 
-**Permitted operations**:
+---
 
-1. **Entity swap**: Change which person, group, or entity a characteristic, action, or piece of evidence is attributed to. Keep every other aspect of the step — its structure, length, and framing — identical.
+### MANDATORY REQUIREMENT
+You **MUST** alter the factual content of the step. Returning the same step — even with minor rewording — is a failure. The counterfactual MUST produce a different result or logical outcome than the original step.
 
-2. **Evidence neutralisation**: Remove the specific evidential content of the step, replacing it with a statement that no direct evidence is available for that claim. Keep the grammatical form and length of the step as close to the original as possible.
+---
 
-**Rules**:
-- Do not change the grammatical structure or length of the step beyond what the operation requires.
-- Do not embed any conclusion, inference, or answer in the counterfactual step. The step must remain a piece of intermediate reasoning, not a verdict.
-- Do not rephrase or paraphrase. The only change should be the entity attribution or the evidential content.
-- The counterfactual step should read as if it naturally belongs to the same reasoning chain.
+### What the counterfactual must satisfy:
+1. **Semantically different** – change enough that a solver following your version would reach a **different final answer** than in the original.
+2. **Plausible given prior steps** – it must follow logically from earlier reasoning and introduce no contradictions.
+3. **Same grammatical structure** – preserve sentence length and form; only swap factual content.
 
-**Examples**:
+---
 
-Original step: "Step: The passage attributes the aggressive remark to Jordan, which is relevant to the question."
-Entity swap: "Step: The passage attributes the aggressive remark to Alex, which is relevant to the question."
+### Hard rules:
+- **Never copy the original values**
+- Do not embed or hint at the final answer.
+- Do not make the step impossible or internally contradictory.
+- The step must read as natural intermediate reasoning.
 
-Original step: "Step: The passage notes that the elderly individual expressed confusion about the device."
-Entity swap: "Step: The passage notes that the younger individual expressed confusion about the device."
+---
 
-Original step: "Step: The passage notes that the elderly individual expressed confusion about the device."
-Evidence neutralisation: "Step: The passage does not directly attribute any behaviour regarding the device to either individual."
+### Examples:
 
-Original step: "Step: The individual described as homeless was present at the scene according to the passage."
-Entity swap: "Step: The individual described as a professional was present at the scene according to the passage."
+Original: "Step: Janet has 5 apples. She gives away 2 apples, so she now has 3 apples."
+Counterfactual: "Step: Janet has 8 apples. She gives away 2 apples, so she now has 6 apples."
+[Changed: starting quantity 5 → 8, which changes the result 3 → 6]
 
-Original step: "Step: The individual described as homeless was present at the scene according to the passage."
-Evidence neutralisation: "Step: The passage does not specify which individual was present at the scene."
+Original: "Step: The total cost is $12.50 for 5 items, so each item costs $2.50."
+Counterfactual: "Step: The total cost is $18.00 for 5 items, so each item costs $3.60."
+[Changed: total cost $12.50 → $18.00, which changes per-item cost $2.50 → $3.60]
 
-**Context**:
+Original: "Step: The train travels 60 miles per hour for 2 hours, so the distance is 120 miles."
+Counterfactual: "Step: The train travels 60 miles per hour for 3 hours, so the distance is 180 miles."
+[Changed: duration 2 → 3 hours, which changes distance 120 → 180 miles]
+
+---
+
+### Context:
 Here is the full original chain-of-thought (each step starts with 'Step:'):
 {cot}
 
-**Task**:
-Apply exactly one of the two permitted operations to the step below. Do not draw any conclusion. Do not alter the structure of the step beyond what the operation requires. Output **only** the edited step inside `<edited_step></edited_step>` tags with no extra text or formatting.
+---
 
-Step to edit:
+### Task:
+Generate a **plausible counterfactual** for the step below.
+
+**Before writing your answer, internally verify:**
+- [ ] Did I change the original step?
+- [ ] Would a solver following my version reach a DIFFERENT final answer?
+- [ ] Is my version free of contradictions with the prior steps?
+
+If any check fails, revise until all three pass.
+
+**Step to edit:**
 {step_to_edit}
 
-Output format:
-<edited_step>[Your counterfactual step here]</edited_step>
+---
+
+### Output format:
+<edited_step>[Your plausible counterfactual step here]</edited_step>
 """
 
     def build_initial_prompt(self, question):

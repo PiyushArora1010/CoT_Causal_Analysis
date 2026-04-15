@@ -93,7 +93,6 @@ with gr.Blocks(
             final_answer = gr.Textbox(label="Final Answer", lines=3)
             edited_response = gr.Textbox(label="Full Model Response", lines=12)
 
-    # --- Event wiring ---
     run_btn.click(
         fn=generate_cot,
         inputs=[question],
